@@ -3,6 +3,8 @@ type TestCase = {
   run: () => void | Promise<void>;
 };
 
+import { runClientValidationTests } from '../renderer/features/clients/client.validation.test';
+import { runCompanyValidationTests } from '../renderer/features/company/company.validation.test';
 import { runInvoiceHelperTests } from '../renderer/features/invoices/invoice.helpers.test';
 import { runInvoiceNumberTests } from '../renderer/features/invoices/invoice-number.service.test';
 import { runInvoicesStorageTests } from '../renderer/features/invoices/invoices.storage.test';
@@ -14,6 +16,8 @@ import { runWebStorageTests } from '../renderer/lib/storage/web-storage.test';
 import { runDateUtilTests } from '../renderer/lib/utils/date.test';
 
 const tests: TestCase[] = [
+  { name: 'client.validation', run: runClientValidationTests },
+  { name: 'company.validation', run: runCompanyValidationTests },
   { name: 'invoice.helpers', run: runInvoiceHelperTests },
   { name: 'invoice-number.service', run: runInvoiceNumberTests },
   { name: 'invoices.storage', run: runInvoicesStorageTests },

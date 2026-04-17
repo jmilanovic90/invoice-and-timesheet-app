@@ -21,6 +21,16 @@ import { createTimesheet, getTimesheetById, updateTimesheet } from '../features/
 import { validateTimesheet } from '../features/timesheets/timesheet.validation';
 import { printTimesheetDocument } from '../lib/print/print-timesheet';
 
+function clampNumberInput(value: string | number, min: number, max: number): number {
+  const parsed = typeof value === 'number' ? value : Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return min;
+  }
+
+  return Math.min(max, Math.max(min, parsed));
+}
+
 interface TimesheetEditorPageProps {
   seedConfig: TimesheetSeedConfig | null;
   editingTimesheetId?: string | null;
@@ -81,11 +91,18 @@ export function TimesheetEditorPage({
   );
 
   const updateDraftField = (name: keyof TimesheetDraft, value: string | number) => {
+    const nextValue =
+      name === 'targetHoursPerWeek'
+        ? clampNumberInput(value, 0, 168)
+        : name === 'employeeName' || name === 'projectName'
+          ? String(value).slice(0, 120)
+          : value;
+
     setDraft((current) =>
       current
         ? {
             ...current,
-            [name]: value
+            [name]: nextValue
           }
         : current
     );
@@ -128,7 +145,7 @@ export function TimesheetEditorPage({
               day.date === date
                 ? {
                     ...day,
-                    comment: value
+                    comment: value.slice(0, 250)
                   }
                 : day
             )
@@ -205,7 +222,7 @@ export function TimesheetEditorPage({
                 const hasErrors = Object.values(validationErrors).some(Boolean);
 
                 if (hasErrors) {
-                  setValidationMessage('Month, year, and target hours must be valid before saving.');
+                  setValidationMessage('Please review the highlighted timesheet fields before saving.');
                   return;
                 }
 
@@ -244,6 +261,7 @@ export function TimesheetEditorPage({
                   <input
                     className="timesheet-sheet__inline-input"
                     value={draft.employeeName}
+                    maxLength={120}
                     onChange={(event) => updateDraftField('employeeName', event.target.value)}
                   />
                 </div>
@@ -267,6 +285,7 @@ export function TimesheetEditorPage({
                   <input
                     className="timesheet-sheet__inline-input"
                     value={draft.projectName}
+                    maxLength={120}
                     onChange={(event) => updateDraftField('projectName', event.target.value)}
                   />
                 </div>
@@ -277,9 +296,11 @@ export function TimesheetEditorPage({
                   className="timesheet-sheet__target-input"
                   type="number"
                   min="1"
+                  max="168"
+                  step="1"
                   value={draft.targetHoursPerWeek}
                   onChange={(event) =>
-                    updateDraftField('targetHoursPerWeek', Number(event.target.value) || 0)
+                    updateDraftField('targetHoursPerWeek', clampNumberInput(event.target.value, 0, 168))
                   }
                 />
               </div>
@@ -338,6 +359,7 @@ export function TimesheetEditorPage({
                         className="timesheet-table__comment-input"
                         type="text"
                         value={day.comment}
+                        maxLength={250}
                         onChange={(event) => updateDayComment(day.date, event.target.value)}
                       />
                     </td>

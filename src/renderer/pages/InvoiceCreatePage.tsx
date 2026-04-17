@@ -34,6 +34,36 @@ const currencyOptions: Array<{ label: string; value: CurrencyCode }> = invoiceCu
   value: currency
 }));
 
+function clampNumberInput(value: string, min: number, max: number): number {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return min;
+  }
+
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function normalizeInvoiceField(name: string, value: string): string | number {
+  if (name === 'paymentDeadlineDays') {
+    return clampNumberInput(value, 0, 365);
+  }
+
+  if (name === 'issuerIban') {
+    return value.toUpperCase().replace(/\s+/g, '');
+  }
+
+  if (name === 'tradingPlace') {
+    return value.slice(0, 80);
+  }
+
+  if (name === 'notes' || name === 'taxNote') {
+    return value.slice(0, 1500);
+  }
+
+  return value;
+}
+
 interface InvoiceCreatePageProps {
   editingInvoiceId?: string | null;
   onFinishEditing?: () => void;
@@ -70,8 +100,14 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
     setInvoiceCount(invoicesResponse.length);
 
     if (editingInvoice) {
-      const { id: _id, invoiceNumber, subtotal: _subtotal, discountTotal: _discountTotal, grandTotal: _grandTotal, ...editingDraft } =
-        editingInvoice;
+      const {
+        id: _id,
+        invoiceNumber,
+        subtotal: _subtotal,
+        discountTotal: _discountTotal,
+        grandTotal: _grandTotal,
+        ...editingDraft
+      } = editingInvoice;
       setExistingInvoiceNumber(invoiceNumber);
       setDraft({
         ...editingDraft,
@@ -105,9 +141,11 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
   };
 
   const handleFieldChange = (name: string, value: string) => {
+    const nextValue = normalizeInvoiceField(name, value);
+
     setDraft((current) => ({
       ...current,
-      [name]: name === 'paymentDeadlineDays' ? Number(value) || 0 : value
+      [name]: nextValue
     }));
     setErrors((current) => ({
       ...current,
@@ -124,9 +162,13 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
           ? {
               ...item,
               [field]:
-                field === 'quantity' || field === 'price' || field === 'discount'
-                  ? Number(value) || 0
-                  : value
+                field === 'quantity'
+                  ? clampNumberInput(value, 0, 1_000_000)
+                  : field === 'price'
+                    ? clampNumberInput(value, 0, 1_000_000_000)
+                    : field === 'discount'
+                      ? clampNumberInput(value, 0, 100)
+                      : value.slice(0, 200)
             }
           : item
       )
@@ -249,12 +291,14 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                 value={draft.tradingPlace}
                 onChange={handleFieldChange}
                 error={errors.tradingPlace}
+                maxLength={80}
               />
               <InputField
                 label="Invoice date"
                 name="invoiceDate"
                 value={draft.invoiceDate}
                 onChange={handleFieldChange}
+                error={errors.invoiceDate}
                 type="date"
               />
               <InputField
@@ -262,6 +306,7 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                 name="tradingDate"
                 value={draft.tradingDate}
                 onChange={handleFieldChange}
+                error={errors.tradingDate}
                 type="date"
               />
               <InputField
@@ -269,7 +314,11 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                 name="paymentDeadlineDays"
                 value={String(draft.paymentDeadlineDays)}
                 onChange={handleFieldChange}
+                error={errors.paymentDeadlineDays}
                 type="number"
+                min={1}
+                max={365}
+                step={1}
               />
               <SelectField
                 label="IBAN"
@@ -277,6 +326,7 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                 value={draft.issuerIban}
                 onChange={handleFieldChange}
                 options={ibanOptions.length ? ibanOptions : [{ label: 'No IBAN saved', value: '' }]}
+                error={errors.issuerIban}
               />
               <SelectField
                 label="Currency"
@@ -312,6 +362,7 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                       name={`description-${item.id}`}
                       value={item.description}
                       onChange={(_name, value) => handleItemChange(item.id, 'description', value)}
+                      maxLength={200}
                     />
                     <SelectField
                       label="Unit"
@@ -326,6 +377,9 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                       value={String(item.quantity)}
                       onChange={(_name, value) => handleItemChange(item.id, 'quantity', value)}
                       type="number"
+                      min={0}
+                      max={1000000}
+                      step={0.01}
                     />
                     <InputField
                       label="Price"
@@ -333,6 +387,9 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                       value={String(item.price)}
                       onChange={(_name, value) => handleItemChange(item.id, 'price', value)}
                       type="number"
+                      min={0}
+                      max={1000000000}
+                      step={0.01}
                     />
                     <InputField
                       label="Discount (%)"
@@ -340,6 +397,9 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                       value={String(item.discount)}
                       onChange={(_name, value) => handleItemChange(item.id, 'discount', value)}
                       type="number"
+                      min={0}
+                      max={100}
+                      step={0.01}
                     />
                     <div className="line-item-total">
                       <span className="field__label">Line total</span>
@@ -359,6 +419,7 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                 value={draft.notes}
                 onChange={handleFieldChange}
                 placeholder="Payment deadline is 15 days."
+                maxLength={1500}
               />
               <TextareaField
                 label="Note on tax exemption"
@@ -366,8 +427,12 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
                 value={draft.taxNote}
                 onChange={handleFieldChange}
                 placeholder="VAT note"
+                maxLength={1500}
               />
             </div>
+
+            {errors.notes ? <div className="input-field__error">{errors.notes}</div> : null}
+            {errors.taxNote ? <div className="input-field__error">{errors.taxNote}</div> : null}
 
             <div className="form-actions">
               <div className="form-actions__status">{statusMessage}</div>
