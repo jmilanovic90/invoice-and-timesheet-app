@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/nbs-exchange-rate/:path*",
+      "destination": "https://webappcenter.nbs.rs/:path*"
+    }
+  ]
+}
