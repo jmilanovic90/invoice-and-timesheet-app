@@ -23,6 +23,7 @@ A web application for managing company and client data, creating invoices and ti
 4. If your data disappears, check whether browser storage was cleared or if you changed browser, profile, or device.
 
 ## How To Use The App
+### App can be used for generating pdf invoices and timesheets at any time, but long-term usage has storage limitations (read below)
 1. Open `Company` and enter your company details.
 2. Add a logo if you want it to appear on invoice and timesheet PDFs.
 3. Open `Clients` and add one or more clients.
