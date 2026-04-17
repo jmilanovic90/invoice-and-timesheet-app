@@ -3,21 +3,12 @@ import { WebStorage } from '../../lib/storage/web-storage';
 import { createId } from '../../lib/utils/id';
 
 const storage = new WebStorage();
-const clientsStorageKey = 'invoice-app/clients';
-
-const seededClients: Client[] = [
-  {
-    id: 'client-service-ocean',
-    name: 'ServiceOcean AG',
-    address: 'Multergasse 11',
-    city: 'St. Gallen',
-    country: 'Switzerland',
-    vatNumber: 'CH-320.4.073.969-4'
-  }
-];
+const clientsStorageKey = 'invoice-app/clients-v2';
+const legacyClientsStorageKey = 'invoice-app/clients';
 
 export function getClients(): Promise<Client[]> {
-  return Promise.resolve(storage.read(clientsStorageKey, seededClients));
+  storage.remove(legacyClientsStorageKey);
+  return Promise.resolve(storage.read(clientsStorageKey, [] as Client[]));
 }
 
 export async function createClient(values: Omit<Client, 'id'>): Promise<Client> {

@@ -5,38 +5,8 @@ import { calculateInvoiceTotals, normalizeInvoiceDraft } from './invoice.helpers
 import { generateInvoiceNumber } from './invoice-number.service';
 
 const storage = new WebStorage();
-const invoicesStorageKey = 'invoice-app/invoices';
-
-const seededInvoices: Invoice[] = [
-  {
-    id: 'f9037dae527f5430a3a0c14a9a4fd50c7afcd9523e60531585d1b388b883ade7',
-    invoiceNumber: '10/2025',
-    invoiceDate: '2025-06-12',
-    tradingDate: '2025-06-12',
-    tradingPlace: 'Novi Sad',
-    clientId: 'client-service-ocean',
-    issuerIban: 'RS35325960170008442473',
-    currency: 'EUR',
-    notes: 'Payment deadline is 15 days.',
-    taxNote:
-      'Not in the VAT system. VAT not calculated according to article 33 of Law on value added tax.',
-    paymentDeadlineDays: 15,
-    items: [
-      {
-        id: 'item-seed-1',
-        description: 'E2E Test Automation of Regression Set',
-        unit: 'hour',
-        quantity: 20,
-        price: 50,
-        discount: 0,
-        total: 1000
-      }
-    ],
-    subtotal: 1000,
-    discountTotal: 0,
-    grandTotal: 1000
-  }
-];
+const invoicesStorageKey = 'invoice-app/invoices-v2';
+const legacyInvoicesStorageKey = 'invoice-app/invoices';
 
 function normalizeInvoice(invoice: Invoice & { issuerIban?: string }): Invoice {
   return {
@@ -46,7 +16,8 @@ function normalizeInvoice(invoice: Invoice & { issuerIban?: string }): Invoice {
 }
 
 export function getInvoices(): Promise<Invoice[]> {
-  const stored = storage.read(invoicesStorageKey, seededInvoices as Array<Invoice & { issuerIban?: string }>);
+  storage.remove(legacyInvoicesStorageKey);
+  const stored = storage.read(invoicesStorageKey, [] as Array<Invoice & { issuerIban?: string }>);
   return Promise.resolve(stored.map(normalizeInvoice));
 }
 
