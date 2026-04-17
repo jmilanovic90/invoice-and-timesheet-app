@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createRoot } from 'react-dom/client';
 import type { Client } from '../../shared/types/client';
 import type { Company } from '../../shared/types/company';
 import type { TimesheetDraft, TimesheetSeedConfig } from '../../shared/types/timesheet';
 import { Button } from '../components/common/Button';
 import { SectionCard } from '../components/common/SectionCard';
+import { TimesheetDocument } from '../components/timesheets/TimesheetDocument';
 import { getClients } from '../features/clients/clients.storage';
 import { getCompany } from '../features/company/company.storage';
 import { createDefaultTimesheetDraft } from '../features/timesheets/timesheet.defaults';
@@ -17,6 +19,7 @@ import {
 } from '../features/timesheets/timesheet.helpers';
 import { createTimesheet, getTimesheetById, updateTimesheet } from '../features/timesheets/timesheets.storage';
 import { validateTimesheet } from '../features/timesheets/timesheet.validation';
+import { printTimesheetDocument } from '../lib/print/print-timesheet';
 
 interface TimesheetEditorPageProps {
   seedConfig: TimesheetSeedConfig | null;
@@ -61,6 +64,21 @@ export function TimesheetEditorPage({
 
   const totalHours = useMemo(() => (draft ? calculateTimesheetTotal(draft.days) : 0), [draft]);
   const logoSource = company?.logoDataUrl || '';
+  const selectedClient = useMemo(
+    () => (draft ? clients.find((client) => client.id === draft.clientId) ?? null : null),
+    [clients, draft]
+  );
+  const previewTimesheet = useMemo(
+    () =>
+      draft
+        ? {
+            ...draft,
+            id: editingTimesheetId ?? 'timesheet-preview',
+            totalHours
+          }
+        : null,
+    [draft, editingTimesheetId, totalHours]
+  );
 
   const updateDraftField = (name: keyof TimesheetDraft, value: string | number) => {
     setDraft((current) =>
@@ -120,6 +138,39 @@ export function TimesheetEditorPage({
     setStatusMessage('');
   };
 
+  const handlePrintTimesheet = () => {
+    if (!previewTimesheet) {
+      return;
+    }
+
+    const mountNode = document.createElement('div');
+    mountNode.style.position = 'fixed';
+    mountNode.style.left = '-99999px';
+    mountNode.style.top = '0';
+    document.body.appendChild(mountNode);
+
+    const root = createRoot(mountNode);
+    root.render(
+      <TimesheetDocument timesheet={previewTimesheet} company={company} client={selectedClient} />
+    );
+
+    window.setTimeout(() => {
+      const printRoot = mountNode.querySelector('[data-print-root="timesheet-document"]');
+      if (!(printRoot instanceof HTMLElement)) {
+        root.unmount();
+        mountNode.remove();
+        return;
+      }
+
+      printTimesheetDocument(printRoot, `${getMonthLabel(previewTimesheet.month)}-${previewTimesheet.year}-timesheet`);
+
+      window.setTimeout(() => {
+        root.unmount();
+        mountNode.remove();
+      }, 300);
+    }, 0);
+  };
+
   if (!draft) {
     return null;
   }
@@ -144,6 +195,9 @@ export function TimesheetEditorPage({
           <div className="inline-actions">
             <Button variant="secondary" onClick={onClose}>
               Back to timesheets
+            </Button>
+            <Button variant="secondary" onClick={handlePrintTimesheet}>
+              Print / Save PDF
             </Button>
             <Button
               onClick={async () => {
