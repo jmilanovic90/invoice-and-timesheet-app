@@ -17,7 +17,7 @@ A web application for managing company and client data, creating invoices and ti
    `npm run build`
 
 ## Access Through Vercel
-1. Open the Vercel deployment link for the app.
+1. Open the Vercel deployment link for the app https://invoice-and-timesheet-app-git-main-jmilanovic90-8991s-projects.vercel.app/
 2. The app runs directly in the browser, with no local installation needed.
 3. For the best result, use one browser and one device for the same set of data.
 4. If your data disappears, check whether browser storage was cleared or if you changed browser, profile, or device.
