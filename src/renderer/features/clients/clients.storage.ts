@@ -1,38 +1,35 @@
 import type { Client } from '../../../shared/types/client';
-import { WebStorage } from '../../lib/storage/web-storage';
 import { createId } from '../../lib/utils/id';
+import { apiRequest } from '../../lib/api/http';
 
-const storage = new WebStorage();
-const clientsStorageKey = 'invoice-app/clients-v2';
-const legacyClientsStorageKey = 'invoice-app/clients';
-
-export function getClients(): Promise<Client[]> {
-  storage.remove(legacyClientsStorageKey);
-  return Promise.resolve(storage.read(clientsStorageKey, [] as Client[]));
+export async function getClients(): Promise<Client[]> {
+  try {
+    return await apiRequest<Client[]>('/clients');
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 }
 
 export async function createClient(values: Omit<Client, 'id'>): Promise<Client> {
-  const clients = await getClients();
-  const nextClient: Client = {
-    ...values,
-    id: createId('client')
-  };
-
-  storage.write(clientsStorageKey, [...clients, nextClient]);
-  return nextClient;
+  return apiRequest<Client>('/clients', {
+    method: 'POST',
+    body: JSON.stringify({
+      ...values,
+      id: createId('client')
+    })
+  });
 }
 
 export async function updateClient(values: Client): Promise<Client> {
-  const clients = await getClients();
-  const nextClients = clients.map((client) => (client.id === values.id ? values : client));
-
-  storage.write(clientsStorageKey, nextClients);
-  return values;
+  return apiRequest<Client>(`/clients/${values.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(values)
+  });
 }
 
 export async function deleteClient(clientId: string): Promise<void> {
-  const clients = await getClients();
-  const nextClients = clients.filter((client) => client.id !== clientId);
-
-  storage.write(clientsStorageKey, nextClients);
+  await apiRequest<void>(`/clients/${clientId}`, {
+    method: 'DELETE'
+  });
 }
