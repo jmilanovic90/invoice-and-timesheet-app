@@ -1,3 +1,5 @@
+import type { HTMLAttributes } from 'react';
+
 interface InputFieldProps {
   label: string;
   name: string;
@@ -6,6 +8,11 @@ interface InputFieldProps {
   placeholder?: string;
   error?: string;
   type?: string;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  step?: number | string;
+  inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
 }
 
 export function InputField({
@@ -15,7 +22,12 @@ export function InputField({
   onChange,
   placeholder,
   error,
-  type = 'text'
+  type = 'text',
+  maxLength,
+  min,
+  max,
+  step,
+  inputMode
 }: InputFieldProps) {
   return (
     <label className="input-field">
@@ -26,6 +38,11 @@ export function InputField({
         name={name}
         value={value}
         placeholder={placeholder}
+        maxLength={maxLength}
+        min={min}
+        max={max}
+        step={step}
+        inputMode={inputMode}
         onChange={(event) => onChange(name, event.target.value)}
       />
       {error ? <span className="input-field__error">{error}</span> : null}
