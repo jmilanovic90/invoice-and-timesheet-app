@@ -1,3 +1,7 @@
+import process from 'node:process';
+
+process.loadEnvFile?.();
+
 function requireEnv(name: string): string {
   const value = process.env[name];
 
@@ -13,3 +17,4 @@ export const env = {
   supabaseUrl: requireEnv('SUPABASE_URL'),
   supabaseServiceRoleKey: requireEnv('SUPABASE_SERVICE_ROLE_KEY')
 };
+

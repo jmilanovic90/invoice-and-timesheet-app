@@ -10,5 +10,6 @@
     "types": ["node"],
     "isolatedModules": false
   },
-  "include": ["src/server", "src/shared", "src/renderer/features/invoices/invoice.helpers.ts", "src/renderer/features/timesheets/timesheet.helpers.ts", "src/renderer/features/company/company.defaults.ts", "src/renderer/lib/utils/id.ts"]
+  "include": ["src/server", "src/shared", "api", "src/renderer/features/invoices/invoice.helpers.ts", "src/renderer/features/timesheets/timesheet.helpers.ts", "src/renderer/features/company/company.defaults.ts", "src/renderer/lib/utils/id.ts"]
 }
+
