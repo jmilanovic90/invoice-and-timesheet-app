@@ -226,16 +226,20 @@ export function TimesheetEditorPage({
                   return;
                 }
 
-                if (editingTimesheetId) {
-                  await updateTimesheet(editingTimesheetId, draft);
-                  setStatusMessage('Timesheet updated successfully.');
-                  onClose();
-                  return;
-                }
+                try {
+                  if (editingTimesheetId) {
+                    await updateTimesheet(editingTimesheetId, draft);
+                    setStatusMessage('Timesheet updated successfully.');
+                    onClose();
+                    return;
+                  }
 
-                await createTimesheet(draft);
-                setStatusMessage('Timesheet saved successfully.');
-                onClose();
+                  await createTimesheet(draft);
+                  setStatusMessage('Timesheet saved successfully.');
+                  onClose();
+                } catch {
+                  setValidationMessage('Could not save timesheet right now.');
+                }
               }}
             >
               {editingTimesheetId ? 'Save changes' : 'Save timesheet'}
@@ -404,3 +408,4 @@ export function TimesheetEditorPage({
     </div>
   );
 }
+

@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: Timesheets Service API
+  version: 1.0.0
+paths:
+  /api/timesheets:
+    get:
+      summary: List timesheets
+      responses:
+        '200':
+          description: Timesheets list
+    post:
+      summary: Create timesheet
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: Created timesheet
+  /api/timesheets/{id}:
+    get:
+      summary: Get timesheet by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Timesheet detail
+    put:
+      summary: Update timesheet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Updated timesheet
+    delete:
+      summary: Delete timesheet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: Timesheet deleted

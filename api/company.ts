@@ -1,0 +1,27 @@
+import { getCompanyHandler, putCompanyHandler } from '../src/server/handlers/company.handlers';
+
+interface RequestLike {
+  method?: string;
+  body?: unknown;
+}
+
+interface ResponseLike {
+  setHeader?(name: string, value: string | string[]): void;
+  status(code: number): ResponseLike;
+  json(payload: unknown): void;
+}
+
+export default async function handler(req: RequestLike, res: ResponseLike): Promise<void> {
+  if (req.method === 'GET') {
+    await getCompanyHandler(res);
+    return;
+  }
+
+  if (req.method === 'PUT') {
+    await putCompanyHandler(req.body, res);
+    return;
+  }
+
+  res.setHeader?.('Allow', ['GET', 'PUT']);
+  res.status(405).json({ error: 'Method not allowed.' });
+}

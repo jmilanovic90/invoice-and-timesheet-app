@@ -78,6 +78,8 @@ export function ClientForm({
         setFormValues(emptyClient);
         setStatusMessage('Client added successfully.');
       }
+    } catch {
+      setStatusMessage('Could not save client right now.');
     } finally {
       setIsSaving(false);
     }
@@ -146,3 +148,4 @@ export function ClientForm({
     </form>
   );
 }
+
