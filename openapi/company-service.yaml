@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: Company Service API
+  version: 1.0.0
+paths:
+  /api/company:
+    get:
+      summary: Get company profile
+      responses:
+        '200':
+          description: Company profile
+    put:
+      summary: Save company profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+      responses:
+        '200':
+          description: Saved company profile
+components:
+  schemas:
+    Company:
+      type: object
+      properties:
+        name: { type: string }
+        fullName: { type: string }
+        address: { type: string }
+        city: { type: string }
+        country: { type: string }
+        vatNumber: { type: string }
+        registrationId: { type: string }
+        iban1: { type: string }
+        iban2: { type: string }
+        iban3: { type: string }
+        swift: { type: string }
+        email: { type: string }
+        logoDataUrl: { type: string }

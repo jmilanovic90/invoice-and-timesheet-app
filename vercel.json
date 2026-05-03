@@ -5,5 +5,10 @@
       "source": "/nbs-exchange-rate/:path*",
       "destination": "https://webappcenter.nbs.rs/:path*"
     }
-  ]
+  ],
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs22.x"
+    }
+  }
 }

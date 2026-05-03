@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: Invoices Service API
+  version: 1.0.0
+paths:
+  /api/invoices:
+    get:
+      summary: List invoices
+      responses:
+        '200':
+          description: Invoices list
+    post:
+      summary: Create invoice
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: Created invoice
+  /api/invoices/{id}:
+    get:
+      summary: Get invoice by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Invoice detail
+    put:
+      summary: Update invoice
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Updated invoice
+    delete:
+      summary: Delete invoice
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: Invoice deleted

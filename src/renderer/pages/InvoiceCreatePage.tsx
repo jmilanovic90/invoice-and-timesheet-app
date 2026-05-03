@@ -449,3 +449,4 @@ export function InvoiceCreatePage({ editingInvoiceId = null, onFinishEditing }: 
     </div>
   );
 }
+

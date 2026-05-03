@@ -1,34 +1,43 @@
 {
-    "name":  "invoice-web-app",
-    "version":  "0.1.0",
-    "description":  "Invoice generator web application built with React, TypeScript, and Vite.",
-    "author":  "",
-    "license":  "MIT",
-    "private":  true,
-    "scripts":  {
-                    "dev":  "vite",
-                    "build":  "vite build",
-                    "preview":  "vite preview",
-                    "lint":  "eslint . --max-warnings=0",
-                    "typecheck":  "tsc --noEmit -p tsconfig.json",
-                    "test":  "tsc -p tsconfig.tests.json \u0026\u0026 node .test-dist/tests/run-unit-tests.js",
-                    "test:watch":  "tsc -p tsconfig.tests.json \u0026\u0026 node .test-dist/tests/run-unit-tests.js"
-                },
-    "dependencies":  {
-                         "react":  "^18.3.1",
-                         "react-dom":  "^18.3.1"
-                     },
-    "devDependencies":  {
-                            "@eslint/js":  "^10.0.1",
-                            "@types/node":  "^24.0.0",
-                            "@types/react":  "^18.3.12",
-                            "@types/react-dom":  "^18.3.1",
-                            "@vitejs/plugin-react":  "^4.3.4",
-                            "eslint":  "^10.3.0",
-                            "eslint-plugin-react-hooks":  "^7.1.1",
-                            "globals":  "^17.6.0",
-                            "typescript":  "^5.8.3",
-                            "typescript-eslint":  "^8.59.1",
-                            "vite":  "^5.4.10"
-                        }
+  "name": "invoice-web-app",
+  "version": "0.1.0",
+  "description": "Invoice generator web application built with React, TypeScript, and Vite.",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "vite",
+    "dev:api": "tsx watch src/server/index.ts",
+    "build": "npm run build:web && npm run build:api",
+    "build:web": "vite build",
+    "build:api": "tsc -p tsconfig.server.json",
+    "preview": "vite preview",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.server.json",
+    "test": "tsc -p tsconfig.tests.json && node .test-dist/tests/run-unit-tests.js",
+    "test:watch": "tsc -p tsconfig.tests.json && node .test-dist/tests/run-unit-tests.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "express": "^5.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.6.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.59.1",
+    "vite": "^5.4.10"
+  }
 }

@@ -89,6 +89,8 @@ export function CompanyForm() {
       const savedCompany = await saveCompany(formValues);
       setFormValues(savedCompany);
       setStatusMessage('Company details saved successfully.');
+    } catch {
+      setStatusMessage('Could not save company details right now.');
     } finally {
       setIsSaving(false);
     }
@@ -260,3 +262,4 @@ export function CompanyForm() {
     </form>
   );
 }
+

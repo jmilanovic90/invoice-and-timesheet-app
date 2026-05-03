@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Clients Service API
+  version: 1.0.0
+paths:
+  /api/clients:
+    get:
+      summary: List clients
+      responses:
+        '200':
+          description: Clients list
+    post:
+      summary: Create client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        '201':
+          description: Created client
+  /api/clients/{id}:
+    put:
+      summary: Update client
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Updated client
+    delete:
+      summary: Delete client
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: Client deleted
+components:
+  schemas:
+    Client:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        address: { type: string }
+        city: { type: string }
+        country: { type: string }
+        vatNumber: { type: string }
