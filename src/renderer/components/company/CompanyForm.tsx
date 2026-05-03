@@ -6,6 +6,25 @@ import { validateCompany, type CompanyValidationResult } from '../../features/co
 import { InputField } from '../common/InputField';
 import { Button } from '../common/Button';
 
+const compactCodeFields = new Set(['iban1', 'iban2', 'iban3', 'swift']);
+const uppercaseFields = new Set(['vatNumber', 'registrationId']);
+
+function normalizeCompanyField(name: string, value: string): string {
+  if (compactCodeFields.has(name)) {
+    return value.toUpperCase().replace(/\s+/g, '');
+  }
+
+  if (uppercaseFields.has(name)) {
+    return value.toUpperCase();
+  }
+
+  if (name === 'email') {
+    return value.trim();
+  }
+
+  return value;
+}
+
 export function CompanyForm() {
   const [formValues, setFormValues] = useState<Company>(emptyCompany);
   const [errors, setErrors] = useState<CompanyValidationResult>({});
@@ -22,9 +41,11 @@ export function CompanyForm() {
   }, []);
 
   const handleChange = (name: string, value: string) => {
+    const nextValue = normalizeCompanyField(name, value);
+
     setFormValues((current) => ({
       ...current,
-      [name]: value
+      [name]: nextValue
     }));
     setErrors((current) => ({
       ...current,
@@ -58,7 +79,7 @@ export function CompanyForm() {
 
     if (hasErrors) {
       setErrors(validationErrors);
-      setStatusMessage('Please review the required fields before saving.');
+      setStatusMessage('Please review the highlighted company fields before saving.');
       return;
     }
 
@@ -85,6 +106,7 @@ export function CompanyForm() {
         value={formValues.name}
         onChange={handleChange}
         error={errors.name}
+        maxLength={80}
       />
       <InputField
         label="Full legal name"
@@ -92,6 +114,7 @@ export function CompanyForm() {
         value={formValues.fullName}
         onChange={handleChange}
         error={errors.fullName}
+        maxLength={160}
       />
       <InputField
         label="Address"
@@ -99,6 +122,7 @@ export function CompanyForm() {
         value={formValues.address}
         onChange={handleChange}
         error={errors.address}
+        maxLength={160}
       />
       <InputField
         label="City"
@@ -106,12 +130,15 @@ export function CompanyForm() {
         value={formValues.city}
         onChange={handleChange}
         error={errors.city}
+        maxLength={80}
       />
       <InputField
         label="Country"
         name="country"
         value={formValues.country}
         onChange={handleChange}
+        error={errors.country}
+        maxLength={80}
       />
       <InputField
         label="PIB / VAT"
@@ -119,42 +146,56 @@ export function CompanyForm() {
         value={formValues.vatNumber}
         onChange={handleChange}
         error={errors.vatNumber}
+        maxLength={40}
       />
       <InputField
         label="Company ID / Registration number"
         name="registrationId"
         value={formValues.registrationId}
         onChange={handleChange}
+        error={errors.registrationId}
+        maxLength={40}
       />
       <InputField
         label="Default IBAN"
         name="iban1"
         value={formValues.iban1}
         onChange={handleChange}
+        error={errors.iban1}
+        maxLength={34}
       />
       <InputField
         label="IBAN 2"
         name="iban2"
         value={formValues.iban2}
         onChange={handleChange}
+        error={errors.iban2}
+        maxLength={34}
       />
       <InputField
         label="IBAN 3"
         name="iban3"
         value={formValues.iban3}
         onChange={handleChange}
+        error={errors.iban3}
+        maxLength={34}
       />
       <InputField
         label="SWIFT"
         name="swift"
         value={formValues.swift}
         onChange={handleChange}
+        error={errors.swift}
+        maxLength={11}
       />
       <InputField
         label="Email"
         name="email"
         value={formValues.email}
         onChange={handleChange}
+        error={errors.email}
+        type="email"
+        maxLength={120}
       />
       <div className="input-field input-field--full">
         <div className="input-field__label-row">
@@ -186,7 +227,7 @@ export function CompanyForm() {
           {formValues.logoDataUrl ? (
             <div className="logo-upload__status" aria-live="polite">
               <span className="logo-upload__status-icon" aria-hidden="true">
-                ✓
+                OK
               </span>
               <span>{logoFileName || 'Logo uploaded'}</span>
             </div>
@@ -219,4 +260,3 @@ export function CompanyForm() {
     </form>
   );
 }
-

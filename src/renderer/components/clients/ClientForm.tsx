@@ -5,6 +5,14 @@ import { validateClient, type ClientValidationResult } from '../../features/clie
 import { Button } from '../common/Button';
 import { InputField } from '../common/InputField';
 
+function normalizeClientField(name: string, value: string): string {
+  if (name === 'vatNumber') {
+    return value.toUpperCase();
+  }
+
+  return value;
+}
+
 interface ClientFormProps {
   selectedClient: Client | null;
   onCreate: (values: Omit<Client, 'id'>) => Promise<void>;
@@ -32,7 +40,7 @@ export function ClientForm({
   const handleChange = (name: string, value: string) => {
     setFormValues((current) => ({
       ...current,
-      [name]: value
+      [name]: normalizeClientField(name, value)
     }));
     setErrors((current) => ({
       ...current,
@@ -49,7 +57,7 @@ export function ClientForm({
 
     if (hasErrors) {
       setErrors(validationErrors);
-      setStatusMessage('Please review the required fields before saving.');
+      setStatusMessage('Please review the highlighted client fields before saving.');
       return;
     }
 
@@ -83,6 +91,7 @@ export function ClientForm({
         value={formValues.name}
         onChange={handleChange}
         error={errors.name}
+        maxLength={80}
       />
       <InputField
         label="Address"
@@ -90,6 +99,7 @@ export function ClientForm({
         value={formValues.address}
         onChange={handleChange}
         error={errors.address}
+        maxLength={160}
       />
       <InputField
         label="City"
@@ -97,12 +107,15 @@ export function ClientForm({
         value={formValues.city}
         onChange={handleChange}
         error={errors.city}
+        maxLength={80}
       />
       <InputField
         label="Country"
         name="country"
         value={formValues.country}
         onChange={handleChange}
+        error={errors.country}
+        maxLength={80}
       />
       <InputField
         label="PIB / VAT"
@@ -110,6 +123,7 @@ export function ClientForm({
         value={formValues.vatNumber}
         onChange={handleChange}
         error={errors.vatNumber}
+        maxLength={40}
       />
 
       <div className="form-actions">
